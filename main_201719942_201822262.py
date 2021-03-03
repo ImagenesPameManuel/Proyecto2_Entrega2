@@ -184,7 +184,7 @@ print(error_ka_s)
 print("error kernel a valid ")
 print(error_ka_v)
 #5.1.1. Función MyCCorrelation 2.1
-input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
+#input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
 plt.figure("original_funcionpython") #figura para mostrar imagen original, imagen con cross-correlación con scipy y con función creada
 plt.subplot(1,3,1) # título y remoción de ejes para las diretentes imágenes visualizadas con mapa de color de grises
 plt.title("Imagen original escala grises")
@@ -203,7 +203,7 @@ plt.show()
 error_ka=error_cuadrado(prueba_scipy,prueba_ka) # cálculo error cuadrático medio
 #print(error_ka)
 #5.1.2. Aplicaciones de Cross-Correlación 1.
-input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
+#input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
 noise_kernel_a=MyCCorrelation_201719942_201822262(rosas_noise,kernel_a) # cálculo cross-correlación de imagen con ruido con kernels a y b con función creada previamente
 noise_kernel_b=MyCCorrelation_201719942_201822262(rosas_noise,kernel_b)
 plt.figure("original_kernel_ab") # figura para visualizar imagen original y filtrada con kernels a y b con opciónn de frontera fill
@@ -222,7 +222,7 @@ plt.axis("off")
 plt.tight_layout()
 plt.show()
 #5.1.2. Aplicaciones de Cross-Correlación 3.
-input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
+#input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
 filtro_Gauss_punto3=gaussian_kernel(5,1) # se crea filtro de Gauss con función proporcionada en el enunciado. Filtro de 5x5b con sigma de 1
 cross_filtroGauss=MyCCorrelation_201719942_201822262(rosas_noise,filtro_Gauss_punto3) # cross-correlación con condición de frontera fill de imagen con ruido y filtro de Gauss creado previamente
 plt.figure("Original_kernel_b_Gauss") # figura para mostrar imagen original e imagen filtrada con filtro de gauss decrito previamente  y kernel b
@@ -241,7 +241,7 @@ plt.axis("off")
 plt.tight_layout()
 plt.show()
 #5.1.2. Aplicaciones de Cross-Correlación 5.
-input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
+#input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
 filtro1_Gauss_punto5=gaussian_kernel(3,1) # creación de filtros Gaussianos con tamaño constante y sigma variable
 filtro2_Gauss_punto5=gaussian_kernel(3,50)
 filtro3_Gauss_punto5=gaussian_kernel(3,100)
@@ -264,7 +264,7 @@ plt.axis("off")
 plt.tight_layout()
 plt.show()
 #5.1.2. Aplicaciones de Cross-Correlación 7.  VA A BOTAR ERROR función no sirve para filtros con tamaño diferente 3x3
-input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
+#input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
 filtro1_Gauss_punto7=gaussian_kernel(3,5) #se crean tres diferentes filtros de Gauss con función dada variando el tamaño y mateniendo el sigma constante
 filtro2_Gauss_punto7=gaussian_kernel(5,5)
 filtro3_Gauss_punto7=gaussian_kernel(7,5)
@@ -287,7 +287,7 @@ plt.axis("off")
 plt.tight_layout()
 plt.show()
 #5.1.2. Aplicaciones de Cross-Correlación 8.
-input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
+#input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
 prueba_kc_v=MyCCorrelation_201719942_201822262(rosas_noise,kernel_c,boundary_condition="valid") # cross-correlación con kernels c y d con imagen co ruido y condición de frontera valid
 prueba_kd_v=MyCCorrelation_201719942_201822262(rosas_noise,kernel_d,boundary_condition="valid")
 plt.figure("kernel_c_y_kernel_d") # figura ara mostrar cross-correlación de imagen con ruido con kernels c y d
@@ -302,7 +302,7 @@ plt.axis("off")
 plt.tight_layout()
 plt.show()
 #BONO
-input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
+#input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
 prueba_kc_BONO=np.absolute(MyCCorrelation_201719942_201822262(rosas,kernel_c,boundary_condition="valid"))
 prueba_kd_BONO=np.absolute(MyCCorrelation_201719942_201822262(rosas,kernel_d,boundary_condition="valid"))
 plt.figure("BONO")
@@ -317,7 +317,7 @@ plt.axis("off")
 plt.tight_layout()
 plt.show()
 #PROBLEMA BIOMÉDICA
-input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
+#input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
 reference1=io.imread("reference1.jpg") # carga de las diferentes imágenes a trabajar en el problema biomédico
 reference2=io.imread("reference2.jpg")
 reference3=io.imread("reference3.jpeg")
@@ -357,7 +357,7 @@ plt.title("Histograma Parasitized.png")
 plt.hist(parasitized.flatten())"""
 plt.tight_layout()
 plt.show()
-input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
+#input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
 def myImagePreprocessor(image, target_hist, action="show"):
     """
     Preprocesamiento de imagen de entrada con imagen target
@@ -416,12 +416,12 @@ def myImagePreprocessor(image, target_hist, action="show"):
     return matched_image
 ref1=myImagePreprocessor(parasitized,reference1,action="save")
 ref1_show=myImagePreprocessor(parasitized,reference1,action="show")
-input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
+#input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
 ref2=myImagePreprocessor(parasitized,reference2,action="save")
 ref2_show=myImagePreprocessor(parasitized,reference2,action="show")
-input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
+#input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
 ref3=myImagePreprocessor(parasitized,reference3,action="save")
 ref3_show=myImagePreprocessor(parasitized,reference3,action="show")
-input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
+#input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
 mejor_especif=myImagePreprocessor(parasitized,reference2,action="save")
 mejor_especif_show=myImagePreprocessor(uninfected,reference2,action="show")
