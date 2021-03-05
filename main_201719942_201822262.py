@@ -8,6 +8,7 @@ import skimage.exposure as expo
 from scipy.signal import correlate2d
 from skimage.color import rgb2gray
 import matplotlib.pyplot as plt
+import os
 ##
 #se crean kernels propuestos en la guía con arreglos de numpy
 kernel_a=np.array([[1,1,1],[1,1,1],[1,1,1]])
@@ -428,19 +429,12 @@ mejor_especif=myImagePreprocessor(parasitized,reference2,action="save")
 mejor_especif_show=myImagePreprocessor(uninfected,reference2,action="show")
 
 ##
-imag_ruido1 = rgb2gray(io.imread("noisy1.jpg")) #se le quita 3D a la imagen para convertirla en una imagen blanco-negro
-imag_ruido2 = rgb2gray(io.imread("noisy2.jpg")) #se le quita 3D a la imagen para convertirla en una imagen blanco-negro
+img1 = io.imread(os.path.abspath("2/Proyecto2_Entrega2/noisy1.jpg"))
+img2 = io.imread(os.path.abspath("2/Proyecto2_Entrega2/noisy2.jpg"))
+imag_ruido1 = rgb2gray(img1) #se le quita 3D a la imagen para convertirla en una imagen blanco-negro
+imag_ruido2 = rgb2gray(img2) #se le quita 3D a la imagen para convertirla en una imagen blanco-negro
 ##
+# Filro medio adaptativo
 def MyAdaptMedian_201719942_201822262(gray_image, window_size, max_window_size):
-    imagen_arreglo = gray_image.flatten() # se convierte la matriz en arreglo
-    z_min = np.min(imagen_arreglo) # variable para el mínino, se usa la funcion de numpy min
-    z_max = np.max(imagen_arreglo) # variable para el máximo, se usa la funcion de numpy max
-    z_med = np.median(imagen_arreglo) # variable para la mediana, se usa la función de numpy median
-    filtered_image = gray_image.copy() # copia de la imagen
-    np.pad(filtered_image, 1, mode='constant') # se le pone unmarco de ceros NO SÉ SI TIENE QUE SER DE CEROS
-    # pre-etapas
-    # etapa A
-    A_1 = z_min - z_med
-    A_2 = z_max - z_med
-    if( A_1 > 0 and A_2 < 0)
+    
     return filtered_image
