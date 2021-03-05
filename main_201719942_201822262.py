@@ -428,14 +428,19 @@ mejor_especif=myImagePreprocessor(parasitized,reference2,action="save")
 mejor_especif_show=myImagePreprocessor(uninfected,reference2,action="show")
 
 ##
-def MyAdaptMedian_Codigo1_Codigo2(gray_image, window_size, max_window_size):
-    z_min = gray_image[0][0]
-    z_max = z_min
-    z_med = 0
-    for i in range(len(gray_image)):
-        for j in range(len(gray_image[0])):
-            if gray_image[i][j] < z_min:
-                z_min = gray_image[i][j]
-            if gray_image[i][j] > z_max:
-                z_max = gray_image[i][j]
+imag_ruido1 = rgb2gray(io.imread("noisy1.jpg")) #se le quita 3D a la imagen para convertirla en una imagen blanco-negro
+imag_ruido2 = rgb2gray(io.imread("noisy2.jpg")) #se le quita 3D a la imagen para convertirla en una imagen blanco-negro
+##
+def MyAdaptMedian_201719942_201822262(gray_image, window_size, max_window_size):
+    imagen_arreglo = gray_image.flatten() # se convierte la matriz en arreglo
+    z_min = np.min(imagen_arreglo) # variable para el mínino, se usa la funcion de numpy min
+    z_max = np.max(imagen_arreglo) # variable para el máximo, se usa la funcion de numpy max
+    z_med = np.median(imagen_arreglo) # variable para la mediana, se usa la función de numpy median
+    filtered_image = gray_image.copy() # copia de la imagen
+    np.pad(filtered_image, 1, mode='constant') # se le pone unmarco de ceros NO SÉ SI TIENE QUE SER DE CEROS
+    # pre-etapas
+    # etapa A
+    A_1 = z_min - z_med
+    A_2 = z_max - z_med
+    if( A_1 > 0 and A_2 < 0)
     return filtered_image
