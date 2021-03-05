@@ -8,6 +8,7 @@ import skimage.exposure as expo
 from scipy.signal import correlate2d
 from skimage.color import rgb2gray
 import matplotlib.pyplot as plt
+##
 #se crean kernels propuestos en la guía con arreglos de numpy
 kernel_a=np.array([[1,1,1],[1,1,1],[1,1,1]])
 kernel_b=(1/9)*kernel_a
@@ -425,3 +426,16 @@ ref3_show=myImagePreprocessor(parasitized,reference3,action="show")
 #input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
 mejor_especif=myImagePreprocessor(parasitized,reference2,action="save")
 mejor_especif_show=myImagePreprocessor(uninfected,reference2,action="show")
+
+##
+def MyAdaptMedian_Codigo1_Codigo2(gray_image, window_size, max_window_size):
+    z_min = gray_image[0][0]
+    z_max = z_min
+    z_med = 0
+    for i in range(len(gray_image)):
+        for j in range(len(gray_image[0])):
+            if gray_image[i][j] < z_min:
+                z_min = gray_image[i][j]
+            if gray_image[i][j] > z_max:
+                z_max = gray_image[i][j]
+    return filtered_image
