@@ -48,7 +48,19 @@ def MyCCorrelation_201719942_201822262(image, kernel, boundary_condition="fill")
                         j_column+=1 #aumento contador columnas
                     i_fila+=1 # aumento contador filas
     elif boundary_condition=="symm": # para condición de frontera symm
-        copia = image.copy() # copia para realizar reflejo de la imagen
+        imagen_marco = np.pad(image.copy(), a, mode="symmetric") # reflejo de bordes con ayuda de librería numpy pad y modo symmetric del tamaño que indique el kernel de entrada 
+        CCorrelation = np.zeros((len(image) , len(image[0]) ))  # se crea matriz para almacenar cross-correlación con tamaño dependiente de a y b          #print(CCorrelation.shape)
+        for filas in range(0 + a, len(imagen_marco) - a):  # recorrido para realizar la cross-correlación empezando sobre pixel central dado por a y b
+            for columnas in range(0 + b, len(imagen_marco[0]) - b):
+                i_fila = filas - a  # contador de filas para tomar vecinos de pixel central
+                for multi_i in range(len(kernel)):  # recorrido por el tamaño del que kernal para sacar prom del pixelcentral evaluda
+                    j_column = columnas - b  # contador pata columans para tomar vecinos del pixel central
+                    for multi_j in range(len(kernel[0])):
+                        CCorrelation[filas-a][columnas-b] += imagen_marco[i_fila][j_column] * kernel[multi_i][multi_j]  # cálculo cross-correlación
+                        j_column += 1  # aumento contador columnas
+                    i_fila += 1  # aumento contador filas
+        CCorrelation= np.pad(CCorrelation, a, mode="symmetric")
+        """copia = image.copy() # copia para realizar reflejo de la imagen
         primera_fila = copia[0] # primera fila
         # - encuentro las primeras filas
         primeras_filas = copia[0, :]
@@ -130,7 +142,7 @@ def MyCCorrelation_201719942_201822262(image, kernel, boundary_condition="fill")
             fila_aux_final=np.append(CCorrelation_ceros[len(CCorrelation_ceros)-1-reflejofilas, :],np.array(CCorrelation_ceros[0][len(CCorrelation_ceros)-1])*a)
             fila_aux_final=np.insert(fila_aux_final, 0, np.array(CCorrelation_ceros[len(CCorrelation_ceros)-1][0])*a)
             CCorrelation = np.insert(CCorrelation, 0,fila_aux, axis=0)
-            CCorrelation = np.insert(CCorrelation, len(CCorrelation_ceros), fila_aux_final,axis=0)
+            CCorrelation = np.insert(CCorrelation, len(CCorrelation_ceros), fila_aux_final,axis=0)"""
     elif boundary_condition=="valid": # método de frontera valid
         CCorrelation=np.zeros((len(image)-a*2,len(image[0])-b*2)) # matriz para almacenar respuesta
         for filas in range(0+a,len(image)-a): # recorrido para cálculo crosscorrelación como en métodos anterioes
@@ -156,6 +168,17 @@ def error_cuadrado(imageref,imagenew):
             suma_error+=(imageref[i][j]-imagenew[i][j])**2 # suma a la variable suma_error la resta al cuadrado de la posición evaluada en ambas imagenes
     error=suma_error/(len(imageref)*len(imageref[0])) # división de la suma de restas al cuadrado calculada previamente entre las dimensiones de la imagen (cantidad de pixeles)
     return error
+kernel_a=np.array([[1,1,1],[1,1,1],[1,1,1]])
+rosas=io.imread("roses.jpg")
+#rosas_noise=io.imread("noisy_roses.jpg")
+rosas=rgb2gray(rosas) #se le quita 3D a la imagen para convertirla en una imagen blanco-negro
+prueba_ka_s=MyCCorrelation_201719942_201822262(rosas,kernel_a,boundary_condition="symm")
+prueba_scipy_s=correlate2d(rosas,kernel_a,boundary="symm")
+error_ka_s=error_cuadrado(prueba_scipy_s, prueba_ka_s)
+print("error kernel a symm")
+print(error_ka_s)
+print("\n",prueba_scipy_s)
+print("\n",prueba_ka_s)
 ##PROBLEMA BIOMÉDICA
 #input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
 reference1=io.imread("reference1.jpg") # carga de las diferentes imágenes a trabajar en el problema biomédico
