@@ -433,8 +433,22 @@ img1 = io.imread(os.path.abspath("2/Proyecto2_Entrega2/noisy1.jpg"))
 img2 = io.imread(os.path.abspath("2/Proyecto2_Entrega2/noisy2.jpg"))
 imag_ruido1 = rgb2gray(img1) #se le quita 3D a la imagen para convertirla en una imagen blanco-negro
 imag_ruido2 = rgb2gray(img2) #se le quita 3D a la imagen para convertirla en una imagen blanco-negro
+plt.figure()
+plt.subplot(2,1,1)
+plt.title("Noisy 1")
+plt.imshow(imag_ruido1, cmap="gray")
+plt.subplot(2,1,2)
+plt.title("Noisy 2")
+plt.imshow(imag_ruido2, cmap="gray")
+plt.tight_layout
+plt.show()
 ##
 # Filro medio adaptativo
 def MyAdaptMedian_201719942_201822262(gray_image, window_size, max_window_size):
-    
+    imagen_arreglo = gray_image.flatten()  # se convierte la matriz en arreglo
+    z_min = np.min(imagen_arreglo)  # variable para el mínino, se usa la funcion de numpy min
+    z_max = np.max(imagen_arreglo)  # variable para el máximo, se usa la funcion de numpy max
+    z_med = np.median(imagen_arreglo)  # variable para la mediana, se usa la función de numpy median
+    filtered_image = gray_image.copy()  # copia de la imagen
+    np.pad(filtered_image, 1, mode='constant')  # se le pone unmarco de ceros NO SÉ SI TIENE QUE SER DE CEROS
     return filtered_image
