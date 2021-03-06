@@ -12,12 +12,6 @@ from skimage.morphology import disk
 import matplotlib.pyplot as plt
 import os
 import cv2
-##
-#se crean kernels propuestos en la guía con arreglos de numpy
-kernel_a=np.array([[1,1,1],[1,1,1],[1,1,1]])
-kernel_b=(1/9)*kernel_a
-kernel_c=np.array([[-1,0,1],[-2,0,2],[-1,0,1]])
-kernel_d=np.array([[1,2,1],[0,0,0],[-1,2,-1]])
 #con la función indicada en la guía se crea filtro gaussiano
 def gaussian_kernel(size, sigma):
     size = int(size)//2
@@ -66,7 +60,7 @@ def MyCCorrelation_201719942_201822262(image, kernel, boundary_condition="fill")
         filas_secundarias = np.insert(filas_secundarias, 0, primera_fila)
         # guardo los valores de las filas secundarias
         if (a > 1):
-            for i in range(0, len(a)):
+            for i in range(0, (a)):
                 # almacena la segunda fila añadiendo al inicio y al final el valor de la esquina correspondiente
                 segundas_filas = copia[i + 1, :]
                 segundas_filas = np.insert(segundas_filas, 0, np.array(copia[0][0])*a)  # con elemento al principio
@@ -79,7 +73,7 @@ def MyCCorrelation_201719942_201822262(image, kernel, boundary_condition="fill")
         filas_secundarias2 = np.array([[]])
         filas_secundarias2 = np.insert(filas_secundarias2, 0, ultima_fila)
         if (a > 1): # PARA KERNELS CON a>1
-            for i in range(0, len(a)):
+            for i in range(0, (a)):
                 segundas_filas = copia[len(copia) - i - 2, :] # se añaden segundas filas incluyendo en sus extremos el valor del pixel de la esquina correspondiente
                 segundas_filas = np.insert(segundas_filas, 0, np.array(copia[len(copia)-1][0])*a)
                 segundas_filas = np.insert(segundas_filas, len(segundas_filas), np.array(copia[len(copia)-1][len(copia[0]) - 1])*a)
@@ -89,7 +83,7 @@ def MyCCorrelation_201719942_201822262(image, kernel, boundary_condition="fill")
         columnas_secundarias = np.array([[]])
         columnas_secundarias = np.append(columnas_secundarias,primeras_columnas)
         if(a > 1):
-            for i in range(0, len(a)):
+            for i in range(0, (a)):
                 segundas_columnas = copia[:, i+1] # se agregan columans en una misma matriz
                 columnas_secundarias = np.append(columnas_secundarias, segundas_columnas)
         # -encuentro las ultimas columnas
@@ -97,7 +91,7 @@ def MyCCorrelation_201719942_201822262(image, kernel, boundary_condition="fill")
         columnas_secundarias2 = np.array([[]])
         columnas_secundarias2 = np.append(columnas_secundarias2, ultimas_columnas)
         if(a>1):
-            for i in range(0, len(a)):
+            for i in range(0, (a)):
                 segundas_columnas = copia[:, len(copia[0])-2-i] # se agregan columnas en una única matriz
                 columnas_secundarias2 = np.append(columnas_secundarias2, segundas_columnas)
         # -se agrega el primer valor y el último valor al principio y final de la primera fila
@@ -149,11 +143,6 @@ def MyCCorrelation_201719942_201822262(image, kernel, boundary_condition="fill")
                         j_column+=1
                     i_fila+=1
     return CCorrelation
-rosas=io.imread("roses.jpg")
-rosas_noise=io.imread("noisy_roses.jpg")
-rosas=rgb2gray(rosas) #se le quita 3D a la imagen para convertirla en una imagen blanco-negro
-rosas_noise=rgb2gray(rosas_noise)
-##prueba_ka_s=MyCCorrelation_201719942_201822262(rosas,kernel_a,boundary_condition="symm")
 def error_cuadrado(imageref,imagenew):
     """
     Calculo error cruadrático medio
@@ -167,8 +156,7 @@ def error_cuadrado(imageref,imagenew):
             suma_error+=(imageref[i][j]-imagenew[i][j])**2 # suma a la variable suma_error la resta al cuadrado de la posición evaluada en ambas imagenes
     error=suma_error/(len(imageref)*len(imageref[0])) # división de la suma de restas al cuadrado calculada previamente entre las dimensiones de la imagen (cantidad de pixeles)
     return error
-
-#PROBLEMA BIOMÉDICA
+##PROBLEMA BIOMÉDICA
 #input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
 reference1=io.imread("reference1.jpg") # carga de las diferentes imágenes a trabajar en el problema biomédico
 reference2=io.imread("reference2.jpg")
@@ -200,13 +188,6 @@ plt.subplot(2,3,6)
 plt.title("Histograma reference3.jpeg")
 plt.hist(rgb2gray(reference3).flatten(),bins=256)
 plt.tight_layout()
-"""plt.subplot(2,4,4)
-plt.title("Imagen Parasitized.png")
-plt.imshow(parasitized)
-plt.axis("off")
-plt.subplot(2,4,8)
-plt.title("Histograma Parasitized.png")
-plt.hist(parasitized.flatten())"""
 plt.tight_layout()
 plt.show()
 #input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
@@ -281,8 +262,8 @@ mejor_especif_show=myImagePreprocessor(uninfected,reference2,action="show")
 ##
 #img1 = io.imread(os.path.abspath("2/Proyecto2_Entrega2/noisy1.jpg"))
 #img2 = io.imread(os.path.abspath("2/Proyecto2_Entrega2/noisy2.jpg"))
-img2=io.imread("noisy1.jpg")
-img1=io.imread("noisy2.jpg")
+img1=io.imread("noisy1.jpg")
+img2=io.imread("noisy2.jpg")
 imag_ruido1 = rgb2gray(img1) #se le quita 3D a la imagen para convertirla en una imagen blanco-negro
 imag_ruido2 = rgb2gray(img2) #se le quita 3D a la imagen para convertirla en una imagen blanco-negro
 plt.figure()
@@ -330,7 +311,6 @@ def MyAdaptMedian_201719942_201822262(gray_image, window_size, max_window_size):
                         #print("opcmax")
                     size_actual+=1
     return filtered_image
-
 #median(imag_ruido1)
 ## Pruebe con 3 tamaños de ventana diferentes aplicar su función de filtro mediano adaptativo a las imágenes con ruido. Muestre sus experimentos en un subplot con títulos las imágenes con ruido y las respuestas después del filtrado.
 plt.figure()
@@ -348,6 +328,58 @@ plt.imshow(MyAdaptMedian_201719942_201822262(imag_ruido1,19,35), cmap="gray")
 plt.axis("off")
 plt.tight_layout
 plt.show()
+##Pruebe filtrar ambas imágenes con distintos kernels Gaussianos, que varíen en tamaño y valor de σ
+filtro1_Gauss,filtro2_Gauss , filtro3_Gauss , filtro4_Gauss, filtro5_Gauss , filtro6_Gauss=gaussian_kernel(3,1) ,gaussian_kernel(3,50) ,  gaussian_kernel(3,100) , gaussian_kernel(3,5) , gaussian_kernel(5,5) , gaussian_kernel(7,5)# creación de filtros Gaussianos con tamaño constante y sigma variable  #se crean tres diferentes filtros de Gauss con función dada variando el tamaño y mateniendo el sigma constante
+plt.figure("R1_G1")
+prueba_ka_s=MyCCorrelation_201719942_201822262(imag_ruido1,filtro1_Gauss,boundary_condition="fill")
+plt.imshow(prueba_ka_s, cmap="gray")
+plt.figure("R2_G2}1")
+prueba_ka_s=MyCCorrelation_201719942_201822262(imag_ruido2,filtro1_Gauss,boundary_condition="fill")
+plt.imshow(prueba_ka_s, cmap="gray")
+plt.figure()
+prueba_ka_s=MyCCorrelation_201719942_201822262(imag_ruido1,filtro2_Gauss,boundary_condition="fill")
+plt.imshow(prueba_ka_s, cmap="gray")
+plt.figure()
+prueba_ka_s=MyCCorrelation_201719942_201822262(imag_ruido2,filtro2_Gauss,boundary_condition="fill")
+plt.imshow(prueba_ka_s, cmap="gray")
+plt.figure()
+prueba_ka_s=MyCCorrelation_201719942_201822262(imag_ruido1,filtro3_Gauss,boundary_condition="fill")
+plt.imshow(prueba_ka_s, cmap="gray")
+plt.figure()
+prueba_ka_s=MyCCorrelation_201719942_201822262(imag_ruido2,filtro3_Gauss,boundary_condition="fill")
+plt.imshow(prueba_ka_s, cmap="gray")
+plt.figure()
+prueba_ka_s=MyCCorrelation_201719942_201822262(imag_ruido1,filtro4_Gauss,boundary_condition="fill")
+plt.imshow(prueba_ka_s, cmap="gray")
+plt.figure()
+prueba_ka_s=MyCCorrelation_201719942_201822262(imag_ruido2,filtro4_Gauss,boundary_condition="fill")
+plt.imshow(prueba_ka_s, cmap="gray")
+plt.figure()
+prueba_ka_s=MyCCorrelation_201719942_201822262(imag_ruido1,filtro5_Gauss,boundary_condition="fill")
+plt.imshow(prueba_ka_s, cmap="gray")
+plt.figure()
+prueba_ka_s=MyCCorrelation_201719942_201822262(imag_ruido2,filtro5_Gauss,boundary_condition="fill")
+plt.imshow(prueba_ka_s, cmap="gray")
+plt.figure()
+prueba_ka_s=MyCCorrelation_201719942_201822262(imag_ruido1,filtro6_Gauss,boundary_condition="fill")
+plt.imshow(prueba_ka_s, cmap="gray")
+plt.figure()
+prueba_ka_s=MyCCorrelation_201719942_201822262(imag_ruido2,filtro6_Gauss,boundary_condition="fill")
+plt.imshow(prueba_ka_s, cmap="gray")
+
+##Muestre en un subplot el resultado del mejor filtrado para cada imagen y diga con qué filtro y qué parámetros se produce la mejor imagen.
+plt.figure()
+plt.subplot(1,2,1)
+plt.title("noisy1: Filtro mediano adaptativo tamaño ventana = 3")
+plt.imshow(MyAdaptMedian_201719942_201822262(imag_ruido1,3,5), cmap="gray")
+plt.axis("off")
+plt.subplot(1,2,2)
+plt.title("noisy2: Filtro Gauss 5x5 y σ = 5")
+plt.imshow(MyCCorrelation_201719942_201822262(imag_ruido2,filtro5_Gauss,boundary_condition="fill"), cmap="gray")
+plt.axis("off")
+plt.tight_layout
+plt.show()
+
 
 
 
