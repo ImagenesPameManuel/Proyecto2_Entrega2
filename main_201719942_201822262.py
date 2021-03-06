@@ -7,8 +7,10 @@ import skimage.io as io
 import skimage.exposure as expo
 from scipy.signal import correlate2d
 from skimage.color import rgb2gray
+from skimage.filters import median
 import matplotlib.pyplot as plt
 import os
+import cv2
 ##
 #se crean kernels propuestos en la guía con arreglos de numpy
 kernel_a=np.array([[1,1,1],[1,1,1],[1,1,1]])
@@ -150,7 +152,7 @@ rosas=io.imread("roses.jpg")
 rosas_noise=io.imread("noisy_roses.jpg")
 rosas=rgb2gray(rosas) #se le quita 3D a la imagen para convertirla en una imagen blanco-negro
 rosas_noise=rgb2gray(rosas_noise)
-prueba_ka_s=MyCCorrelation_201719942_201822262(rosas,kernel_a,boundary_condition="symm")
+##prueba_ka_s=MyCCorrelation_201719942_201822262(rosas,kernel_a,boundary_condition="symm")
 def error_cuadrado(imageref,imagenew):
     """
     Calculo error cruadrático medio
@@ -164,7 +166,7 @@ def error_cuadrado(imageref,imagenew):
             suma_error+=(imageref[i][j]-imagenew[i][j])**2 # suma a la variable suma_error la resta al cuadrado de la posición evaluada en ambas imagenes
     error=suma_error/(len(imageref)*len(imageref[0])) # división de la suma de restas al cuadrado calculada previamente entre las dimensiones de la imagen (cantidad de pixeles)
     return error
-#carga de imágenes con io.imread
+##carga de imágenes con io.imread
 rosas=io.imread("roses.jpg")
 rosas_noise=io.imread("noisy_roses.jpg")
 rosas=rgb2gray(rosas) #se le quita 3D a la imagen para convertirla en una imagen blanco-negro
@@ -429,8 +431,10 @@ mejor_especif=myImagePreprocessor(parasitized,reference2,action="save")
 mejor_especif_show=myImagePreprocessor(uninfected,reference2,action="show")
 
 ##
-img1 = io.imread(os.path.abspath("2/Proyecto2_Entrega2/noisy1.jpg"))
-img2 = io.imread(os.path.abspath("2/Proyecto2_Entrega2/noisy2.jpg"))
+#img1 = io.imread(os.path.abspath("2/Proyecto2_Entrega2/noisy1.jpg"))
+#img2 = io.imread(os.path.abspath("2/Proyecto2_Entrega2/noisy2.jpg"))
+img2=io.imread("noisy1.jpg")
+img1=io.imread("noisy2.jpg")
 imag_ruido1 = rgb2gray(img1) #se le quita 3D a la imagen para convertirla en una imagen blanco-negro
 imag_ruido2 = rgb2gray(img2) #se le quita 3D a la imagen para convertirla en una imagen blanco-negro
 plt.figure()
@@ -443,12 +447,75 @@ plt.imshow(imag_ruido2, cmap="gray")
 plt.tight_layout
 plt.show()
 ##
-# Filro medio adaptativo
+# Filtro medio adaptativo
 def MyAdaptMedian_201719942_201822262(gray_image, window_size, max_window_size):
-    imagen_arreglo = gray_image.flatten()  # se convierte la matriz en arreglo
-    z_min = np.min(imagen_arreglo)  # variable para el mínino, se usa la funcion de numpy min
-    z_max = np.max(imagen_arreglo)  # variable para el máximo, se usa la funcion de numpy max
-    z_med = np.median(imagen_arreglo)  # variable para la mediana, se usa la función de numpy median
-    filtered_image = gray_image.copy()  # copia de la imagen
-    np.pad(filtered_image, 1, mode='constant')  # se le pone unmarco de ceros NO SÉ SI TIENE QUE SER DE CEROS
+    imagen_marco=np.pad(gray_image.copy(),int(max_window_size)//2,mode="symmetric")
+    filas,columnas=len(gray_image),len(gray_image[0])
+    filtered_image=np.zeros((filas, columnas))
+    desfase=int(max_window_size)//2
+    for fila in range(filas):
+        for columna in range(columnas):
+            fila_pix_original,column_pix_original=fila+desfase,columna+desfase
+            size_actual = window_size
+            while size_actual <= max_window_size:
+                marco_actual = int(size_actual) // 2
+                mini_matriz = imagen_marco[fila_pix_original - marco_actual:   (fila_pix_original) + marco_actual + 1,column_pix_original - marco_actual:    column_pix_original + marco_actual + 1]
+                z_min = np.min(mini_matriz.flatten())  # variable para el mínino, se usa la funcion de numpy min
+                z_max = np.max(mini_matriz.flatten())  # variable para el máximo, se usa la funcion de numpy max
+                z_med = np.median(mini_matriz.flatten())  # variable para la mediana, se usa la función de numpy median
+                A1 = z_med - z_min
+                A2 = z_med - z_max
+                if A1>0 and A2<0:
+                    centro=imagen_marco[fila_pix_original,column_pix_original]
+                    B1=centro-z_min
+                    B2=centro-z_max
+                    if B1>0 and B2<0:
+                        filtered_image[fila][columna] = centro
+                        #print("centro")
+                    else:
+                        filtered_image[fila][columna] = z_med
+                        #print("opc2")
+                    break
+                else:
+                    if size_actual==max_window_size:
+                        filtered_image[fila][columna]=z_med
+                        #print("opcmax")
+                    size_actual+=1
+
+
+
+            #print(c[(2) - 1:   (2) + 1 + 1, 2 - 1:    2 + 1 + 1])
+            #imagen_marco[fila+desfase][columna+desfase]
+        #while size_actual<=max_window_size:
+
+        #size_actual+=1
+
+    #imagen_arreglo = gray_image.flatten()  # se convierte la matriz en arreglo
+    #z_min = np.min(imagen_arreglo)  # variable para el mínino, se usa la funcion de numpy min
+    #z_max = np.max(imagen_arreglo)  # variable para el máximo, se usa la funcion de numpy max
+    #z_med = np.median(imagen_arreglo)  # variable para la mediana, se usa la función de numpy median
+    #filtered_image = gray_image.copy()  # copia de la imagen
+    #np.pad(filtered_image, 1, mode='constant')  # se le pone unmarco de ceros NO SÉ SI TIENE QUE SER DE CEROS
+
     return filtered_image
+
+#median(imag_ruido1)
+##
+print(error_cuadrado(median(imag_ruido1,mode="reflect"),MyAdaptMedian_201719942_201822262(imag_ruido1,3,51)))
+print(error_cuadrado(median(imag_ruido1,mode="mirror"),MyAdaptMedian_201719942_201822262(imag_ruido1,3,51)))
+##plt.figure()
+plt.subplot(2,1,1)
+plt.title("MyAdapt")
+plt.imshow(MyAdaptMedian_201719942_201822262(imag_ruido1,3,5), cmap="gray")
+plt.subplot(2,1,2)
+plt.title("Teoría")
+plt.imshow(median(imag_ruido1,mode="reflect"), cmap="gray")#cv2.medianBlur(imag_ruido1,3), cmap="gray")
+plt.tight_layout
+plt.show()
+##
+kernel_c=np.array([[-1,0,1],[-2,0,2],[-1,0,1]])
+c=np.pad(kernel_c,2,mode="symmetric")
+print(c[   ( 2 ) -   1     :   ( 2 )  +  1  +1,2  -   1     :    2   + 1 + 1])
+
+print(kernel_c)
+print(c)
