@@ -8,6 +8,7 @@ import skimage.exposure as expo
 from scipy.signal import correlate2d
 from skimage.color import rgb2gray
 from skimage.filters import median
+from skimage.morphology import disk
 import matplotlib.pyplot as plt
 import os
 import cv2
@@ -166,160 +167,7 @@ def error_cuadrado(imageref,imagenew):
             suma_error+=(imageref[i][j]-imagenew[i][j])**2 # suma a la variable suma_error la resta al cuadrado de la posición evaluada en ambas imagenes
     error=suma_error/(len(imageref)*len(imageref[0])) # división de la suma de restas al cuadrado calculada previamente entre las dimensiones de la imagen (cantidad de pixeles)
     return error
-##carga de imágenes con io.imread
-rosas=io.imread("roses.jpg")
-rosas_noise=io.imread("noisy_roses.jpg")
-rosas=rgb2gray(rosas) #se le quita 3D a la imagen para convertirla en una imagen blanco-negro
-rosas_noise=rgb2gray(rosas_noise) #se le quita 3D a la imagen para convertirla en una imagen blanco-negro          #print(rosas.shape) #print(kernel_a.shape) print(len(rosas))
-#Comparaciones de resultados función creada con función propia de scipy.signal: correlate2d
-prueba_ka=MyCCorrelation_201719942_201822262(rosas,kernel_a)
-prueba_scipy=correlate2d(rosas,kernel_a,boundary="fill")
-prueba_ka_v=MyCCorrelation_201719942_201822262(rosas,kernel_a,boundary_condition="valid")
-prueba_scipy_v=correlate2d(rosas,kernel_a,mode="valid")
-prueba_ka_s=MyCCorrelation_201719942_201822262(rosas,kernel_a,boundary_condition="symm")
-prueba_scipy_s=correlate2d(rosas,kernel_a,boundary="symm")
-error_ka_s=error_cuadrado(prueba_scipy_s, prueba_ka_s)
-error_ka=error_cuadrado(prueba_scipy,prueba_ka)
-error_ka_v=error_cuadrado(prueba_scipy_v,prueba_ka_v)
-print("error kernel a fill")
-print(error_ka)
-print("error kernel a symm")
-print(error_ka_s)
-print("error kernel a valid ")
-print(error_ka_v)
-#5.1.1. Función MyCCorrelation 2.1
-#input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
-plt.figure("original_funcionpython") #figura para mostrar imagen original, imagen con cross-correlación con scipy y con función creada
-plt.subplot(1,3,1) # título y remoción de ejes para las diretentes imágenes visualizadas con mapa de color de grises
-plt.title("Imagen original escala grises")
-plt.imshow(rosas,cmap="gray")
-plt.axis("off")
-plt.subplot(1,3,2)
-plt.title("Imagen correlate2d con kernel a y fill")
-plt.imshow(prueba_scipy,cmap="gray")
-plt.axis("off")
-plt.subplot(1,3,3)
-plt.title("Imagen MyCCorrelation con kernel a y fill")
-plt.imshow(prueba_ka,cmap="gray")
-plt.axis("off")
-plt.tight_layout()
-plt.show()
-error_ka=error_cuadrado(prueba_scipy,prueba_ka) # cálculo error cuadrático medio
-#print(error_ka)
-#5.1.2. Aplicaciones de Cross-Correlación 1.
-#input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
-noise_kernel_a=MyCCorrelation_201719942_201822262(rosas_noise,kernel_a) # cálculo cross-correlación de imagen con ruido con kernels a y b con función creada previamente
-noise_kernel_b=MyCCorrelation_201719942_201822262(rosas_noise,kernel_b)
-plt.figure("original_kernel_ab") # figura para visualizar imagen original y filtrada con kernels a y b con opciónn de frontera fill
-plt.subplot(1,3,1) # subplotspara cada una de las imágenes descritas previamente con su título y remoción de ejes visualizadas con mapa de color de grises
-plt.title("Imagen original escala grises")
-plt.imshow(rosas_noise,cmap="gray")
-plt.axis("off")
-plt.subplot(1,3,2)
-plt.title("Imagen con kernel a")
-plt.imshow(noise_kernel_a,cmap="gray")
-plt.axis("off")
-plt.subplot(1,3,3)
-plt.title("Imagen con kernel b")
-plt.imshow(noise_kernel_b,cmap="gray")
-plt.axis("off")
-plt.tight_layout()
-plt.show()
-#5.1.2. Aplicaciones de Cross-Correlación 3.
-#input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
-filtro_Gauss_punto3=gaussian_kernel(5,1) # se crea filtro de Gauss con función proporcionada en el enunciado. Filtro de 5x5b con sigma de 1
-cross_filtroGauss=MyCCorrelation_201719942_201822262(rosas_noise,filtro_Gauss_punto3) # cross-correlación con condición de frontera fill de imagen con ruido y filtro de Gauss creado previamente
-plt.figure("Original_kernel_b_Gauss") # figura para mostrar imagen original e imagen filtrada con filtro de gauss decrito previamente  y kernel b
-plt.subplot(1,3,1) # cada imagen tiene su respectivo subplot, remoción de ejes, título y es visualizado con mapa de color de rises
-plt.title("Imagen original escala grises")
-plt.imshow(rosas_noise,cmap="gray")
-plt.axis("off")
-plt.subplot(1,3,2)
-plt.title("Imagen con kernel b")
-plt.imshow(noise_kernel_b,cmap="gray")
-plt.axis("off")
-plt.subplot(1,3,3)
-plt.title("Imagen con filtro Gauss:\n5x5 y σ = 1")
-plt.imshow(cross_filtroGauss,cmap="gray")
-plt.axis("off")
-plt.tight_layout()
-plt.show()
-#5.1.2. Aplicaciones de Cross-Correlación 5.
-#input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
-filtro1_Gauss_punto5=gaussian_kernel(3,1) # creación de filtros Gaussianos con tamaño constante y sigma variable
-filtro2_Gauss_punto5=gaussian_kernel(3,50)
-filtro3_Gauss_punto5=gaussian_kernel(3,100)
-cross1P5_filtroGauss=MyCCorrelation_201719942_201822262(rosas_noise,filtro1_Gauss_punto5) # cálculo cross-correlación de imagen con ruido con los diferentes filtros de Gauss creados previamente
-cross2P5_filtroGauss=MyCCorrelation_201719942_201822262(rosas_noise,filtro2_Gauss_punto5)
-cross3P5_filtroGauss=MyCCorrelation_201719942_201822262(rosas_noise,filtro3_Gauss_punto5)
-plt.figure("Gausstamanofijosigmavariable") #fgura para mostrar el efecto de losdistintos filtros de Gauss creados previamentes sobre la imagen con ruido
-plt.subplot(1,3,1) # subplot para cada una de las imágenes filtradas cada uno tiene su respectivo título, remoción de ejes y es visualizada con color map gris
-plt.title("Imagen con filtro Gauss:\n3x3 y σ = 1")
-plt.imshow(cross1P5_filtroGauss,cmap="gray")
-plt.axis("off")
-plt.subplot(1,3,2)
-plt.title("Imagen con filtro Gauss:\n3x3 y σ = 50")
-plt.imshow(cross2P5_filtroGauss,cmap="gray")
-plt.axis("off")
-plt.subplot(1,3,3)
-plt.title("Imagen con filtro Gauss:\n3x3 y σ = 100")
-plt.imshow(cross3P5_filtroGauss,cmap="gray")
-plt.axis("off")
-plt.tight_layout()
-plt.show()
-#5.1.2. Aplicaciones de Cross-Correlación 7.  VA A BOTAR ERROR función no sirve para filtros con tamaño diferente 3x3
-#input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
-filtro1_Gauss_punto7=gaussian_kernel(3,5) #se crean tres diferentes filtros de Gauss con función dada variando el tamaño y mateniendo el sigma constante
-filtro2_Gauss_punto7=gaussian_kernel(5,5)
-filtro3_Gauss_punto7=gaussian_kernel(7,5)
-cross1P7_filtroGauss=MyCCorrelation_201719942_201822262(rosas_noise,filtro1_Gauss_punto7) # Cross-correlación para los diferentes filtros aplicados a la imagen con ruidp
-cross2P7_filtroGauss=MyCCorrelation_201719942_201822262(rosas_noise,filtro2_Gauss_punto7)
-cross3P7_filtroGauss=MyCCorrelation_201719942_201822262(rosas_noise,filtro3_Gauss_punto7)
-plt.figure("Gausstamanovariablesigmafijo") # se crea figura para mostrar el efecto de variar el tamaño del filtro de Gauss
-plt.subplot(1,3,1) # subplot para mostrar cada una de las cross-correlaciones con los filtros de Gauss creados con anterioridad. Se inserta título, se remueven ejes y se visualiza con mapa de colores gris
-plt.title("Imagen con filtro Gauss:\n3x3 y σ = 5")
-plt.imshow(cross1P7_filtroGauss,cmap="gray")
-plt.axis("off")
-plt.subplot(1,3,2)
-plt.title("Imagen con filtro Gauss:\n5x5 y σ = 5")
-plt.imshow(cross2P7_filtroGauss,cmap="gray")
-plt.axis("off")
-plt.subplot(1,3,3)
-plt.title("Imagen con filtro Gauss:\n7x7 y σ = 5")
-plt.imshow(cross3P7_filtroGauss,cmap="gray")
-plt.axis("off")
-plt.tight_layout()
-plt.show()
-#5.1.2. Aplicaciones de Cross-Correlación 8.
-#input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
-prueba_kc_v=MyCCorrelation_201719942_201822262(rosas_noise,kernel_c,boundary_condition="valid") # cross-correlación con kernels c y d con imagen co ruido y condición de frontera valid
-prueba_kd_v=MyCCorrelation_201719942_201822262(rosas_noise,kernel_d,boundary_condition="valid")
-plt.figure("kernel_c_y_kernel_d") # figura ara mostrar cross-correlación de imagen con ruido con kernels c y d
-plt.subplot(1,2,1) # subplot para cada imagen con su respectivo título, remoción de ejes y visualización con mapa de color gris
-plt.title("Imagen con kernel c")
-plt.imshow(prueba_kc_v,cmap="gray")
-plt.axis("off")
-plt.subplot(1,2,2)
-plt.title("Imagen con kernel d")
-plt.imshow(prueba_kd_v,cmap="gray")
-plt.axis("off")
-plt.tight_layout()
-plt.show()
-#BONO
-#input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
-prueba_kc_BONO=np.absolute(MyCCorrelation_201719942_201822262(rosas,kernel_c,boundary_condition="valid"))
-prueba_kd_BONO=np.absolute(MyCCorrelation_201719942_201822262(rosas,kernel_d,boundary_condition="valid"))
-plt.figure("BONO")
-plt.subplot(1,2,1)
-plt.title("Valor absoluto de la\nimagen con kernel c")
-plt.imshow(prueba_kc_BONO,cmap="gray")
-plt.axis("off")
-plt.subplot(1,2,2)
-plt.title("Imagen con kernel d")
-plt.imshow(prueba_kd_BONO,cmap="gray")
-plt.axis("off")
-plt.tight_layout()
-plt.show()
+
 #PROBLEMA BIOMÉDICA
 #input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
 reference1=io.imread("reference1.jpg") # carga de las diferentes imágenes a trabajar en el problema biomédico
@@ -449,7 +297,7 @@ plt.show()
 ##
 # Filtro medio adaptativo
 def MyAdaptMedian_201719942_201822262(gray_image, window_size, max_window_size):
-    imagen_marco=np.pad(gray_image.copy(),int(max_window_size)//2,mode="symmetric")
+    imagen_marco=np.pad(gray_image.copy(),int(max_window_size)//2,mode="symmetric")# copia de la imagen con bordes de modo symm del tamaño máximo que podría llegar a tener la ventana, se utiliza la función de numpy pad
     filas,columnas=len(gray_image),len(gray_image[0])
     filtered_image=np.zeros((filas, columnas))
     desfase=int(max_window_size)//2
@@ -481,26 +329,30 @@ def MyAdaptMedian_201719942_201822262(gray_image, window_size, max_window_size):
                         filtered_image[fila][columna]=z_med
                         #print("opcmax")
                     size_actual+=1
-
-
-
-            #print(c[(2) - 1:   (2) + 1 + 1, 2 - 1:    2 + 1 + 1])
-            #imagen_marco[fila+desfase][columna+desfase]
-        #while size_actual<=max_window_size:
-
-        #size_actual+=1
-
-    #imagen_arreglo = gray_image.flatten()  # se convierte la matriz en arreglo
-    #z_min = np.min(imagen_arreglo)  # variable para el mínino, se usa la funcion de numpy min
-    #z_max = np.max(imagen_arreglo)  # variable para el máximo, se usa la funcion de numpy max
-    #z_med = np.median(imagen_arreglo)  # variable para la mediana, se usa la función de numpy median
-    #filtered_image = gray_image.copy()  # copia de la imagen
-    #np.pad(filtered_image, 1, mode='constant')  # se le pone unmarco de ceros NO SÉ SI TIENE QUE SER DE CEROS
-
     return filtered_image
 
 #median(imag_ruido1)
-##
+## Pruebe con 3 tamaños de ventana diferentes aplicar su función de filtro mediano adaptativo a las imágenes con ruido. Muestre sus experimentos en un subplot con títulos las imágenes con ruido y las respuestas después del filtrado.
+plt.figure()
+plt.subplot(1,3,1)
+plt.title("Filtro mediano adaptativo\ntamaño ventana = 3")
+plt.imshow(MyAdaptMedian_201719942_201822262(imag_ruido1,3,35), cmap="gray")
+plt.axis("off")
+plt.subplot(1,3,2)
+plt.title("Filtro mediano adaptativo\ntamaño ventana = 9")
+plt.imshow(MyAdaptMedian_201719942_201822262(imag_ruido1,9,35), cmap="gray")
+plt.axis("off")
+plt.subplot(1,3,3)
+plt.title("Filtro mediano adaptativo\ntamaño ventana = 19")
+plt.imshow(MyAdaptMedian_201719942_201822262(imag_ruido1,19,35), cmap="gray")
+plt.axis("off")
+plt.tight_layout
+plt.show()
+
+
+
+
+##PRUEBAS
 print(error_cuadrado(median(imag_ruido1,mode="reflect"),MyAdaptMedian_201719942_201822262(imag_ruido1,3,51)))
 print(error_cuadrado(median(imag_ruido1,mode="mirror"),MyAdaptMedian_201719942_201822262(imag_ruido1,3,51)))
 ##plt.figure()
