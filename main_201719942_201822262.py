@@ -230,9 +230,10 @@ plt.title("noisy1: Filtro mediano adaptativo tamaño ventana = 3")
 plt.imshow(MyAdaptMedian_201719942_201822262(imag_ruido1,3,5), cmap="gray")
 plt.axis("off")
 plt.subplot(1,2,2)
-plt.title("noisy2: Filtro Gauss 5x5 y σ = 5")
+#se comentan las siguientes líneas ya que el subplot se realiza con la función sin haber modificado la función de crosscorrelación para que ahora fuese normalizada, lara visualizar imagen ir a informe
+"""plt.title("noisy2: Filtro Gauss 5x5 y σ = 5") 
 plt.imshow(MyNormCCorrelation_201719942_201822262(imag_ruido2,filtro5_Gauss,boundary_condition="fill"), cmap="gray")
-plt.axis("off")
+plt.axis("off")"""
 plt.tight_layout
 plt.show()
 #PROBLEMA BIOMÉDICA
@@ -345,6 +346,18 @@ especificado6,especificado7,especificado8,especificado9,especificado10=myImagePr
 # almacenamiento de kernels seleccionados tanto de imagen original como preprocesada
 testkernel_1=rgb2gray(parasitized)[12:15,39:42]
 testkernel_2=myImagePreprocessor(rgb2gray(parasitized),rgb2gray(reference2),action="save")[12:15,39:42]
+plt.figure()
+plt.subplot(1,2,1)
+plt.title("Imagen Parasitized.png con kernel 1")
+plt.imshow(MyNormCCorrelation_201719942_201822262(rgb2gray(parasitized),testkernel_1,boundary_condition="symm"), cmap="gray")
+plt.axis("off")
+plt.subplot(1,2,2)
+plt.title("Imagen Parasitized.png con kernel 2")
+plt.imshow(MyNormCCorrelation_201719942_201822262(rgb2gray(parasitized),testkernel_2,boundary_condition="symm"), cmap="gray")
+plt.axis("off")
+plt.tight_layout()
+plt.show()
+input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
 # se muestran valores y etiquetas para las diferentes imágenes
 print("imag1-5 kernel 1 SIN especificado")
 etiqueta(rgb2gray(test1),testkernel_1)
