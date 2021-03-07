@@ -47,8 +47,8 @@ def MyCCorrelation_201719942_201822262(image, kernel, boundary_condition="fill")
                         CCorrelation[filas][columnas]+=fill_image[i_fila][j_column]*kernel[multi_i][multi_j] # cálculo cross-correlación
                         j_column+=1 #aumento contador columnas
                     i_fila+=1 # aumento contador filas
-    elif boundary_condition=="symm": # para condición de frontera symm
-        imagen_marco = np.pad(image.copy(), a, mode="symmetric") # reflejo de bordes con ayuda de librería numpy pad y modo symmetric del tamaño que indique el kernel de entrada 
+    elif boundary_condition=="symm": # para condición de frontera symm # se realiza arreglo de la entrega pasada de esta condición de frontera
+        imagen_marco = np.pad(image.copy(), a, mode="symmetric") # reflejo de bordes con ayuda de librería numpy pad y modo symmetric del tamaño que indique el kernel de entrada
         CCorrelation = np.zeros((len(image) , len(image[0]) ))  # se crea matriz para almacenar cross-correlación con tamaño dependiente de a y b          #print(CCorrelation.shape)
         for filas in range(0 + a, len(imagen_marco) - a):  # recorrido para realizar la cross-correlación empezando sobre pixel central dado por a y b
             for columnas in range(0 + b, len(imagen_marco[0]) - b):
@@ -59,90 +59,7 @@ def MyCCorrelation_201719942_201822262(image, kernel, boundary_condition="fill")
                         CCorrelation[filas-a][columnas-b] += imagen_marco[i_fila][j_column] * kernel[multi_i][multi_j]  # cálculo cross-correlación
                         j_column += 1  # aumento contador columnas
                     i_fila += 1  # aumento contador filas
-        CCorrelation= np.pad(CCorrelation, a, mode="symmetric")
-        """copia = image.copy() # copia para realizar reflejo de la imagen
-        primera_fila = copia[0] # primera fila
-        # - encuentro las primeras filas
-        primeras_filas = copia[0, :]
-        # - agrego primer y último valor a la fila
-        primera_fila = np.insert(primera_fila, 0, np.array(copia[0][0])*a)
-        # primera_fila = np.insert(primera_fila, len(primera_fila), primera_fila[len(primera_fila) - 1])
-        primera_fila = np.append(primera_fila, np.array(primera_fila[len(primera_fila) - 1])*a)
-        filas_secundarias = np.array([[]])
-        filas_secundarias = np.insert(filas_secundarias, 0, primera_fila)
-        # guardo los valores de las filas secundarias
-        if (a > 1):
-            for i in range(0, (a)):
-                # almacena la segunda fila añadiendo al inicio y al final el valor de la esquina correspondiente
-                segundas_filas = copia[i + 1, :]
-                segundas_filas = np.insert(segundas_filas, 0, np.array(copia[0][0])*a)  # con elemento al principio
-                segundas_filas = np.append(primera_fila, np.array(copia[0][len(copia[0]) - 1])*a) #con elemento final
-                filas_secundarias = np.append(filas_secundarias, segundas_filas)
-        # -encuentro las ultimas filas
-        ultima_fila = copia[len(copia) - 1, :] # se extrae ´última fila y se insertan valores extremos para
-        ultima_fila = np.insert(ultima_fila, 0, np.array(copia[len(copia)-1][0])*a)
-        ultima_fila = np.append(ultima_fila, np.array(copia[len(copia)-1][len(copia[0])-1])*a)
-        filas_secundarias2 = np.array([[]])
-        filas_secundarias2 = np.insert(filas_secundarias2, 0, ultima_fila)
-        if (a > 1): # PARA KERNELS CON a>1
-            for i in range(0, (a)):
-                segundas_filas = copia[len(copia) - i - 2, :] # se añaden segundas filas incluyendo en sus extremos el valor del pixel de la esquina correspondiente
-                segundas_filas = np.insert(segundas_filas, 0, np.array(copia[len(copia)-1][0])*a)
-                segundas_filas = np.insert(segundas_filas, len(segundas_filas), np.array(copia[len(copia)-1][len(copia[0]) - 1])*a)
-                filas_secundarias2 = np.append(filas_secundarias2, segundas_filas)
-        # -encuentro las primeras columnas
-        primeras_columnas = copia[:, 0]
-        columnas_secundarias = np.array([[]])
-        columnas_secundarias = np.append(columnas_secundarias,primeras_columnas)
-        if(a > 1):
-            for i in range(0, (a)):
-                segundas_columnas = copia[:, i+1] # se agregan columans en una misma matriz
-                columnas_secundarias = np.append(columnas_secundarias, segundas_columnas)
-        # -encuentro las ultimas columnas
-        ultimas_columnas = copia[:, len(copia[0])-1]
-        columnas_secundarias2 = np.array([[]])
-        columnas_secundarias2 = np.append(columnas_secundarias2, ultimas_columnas)
-        if(a>1):
-            for i in range(0, (a)):
-                segundas_columnas = copia[:, len(copia[0])-2-i] # se agregan columnas en una única matriz
-                columnas_secundarias2 = np.append(columnas_secundarias2, segundas_columnas)
-        # -se agrega el primer valor y el último valor al principio y final de la primera fila
-        # - se agregan las columnas para la respuesta
-        for i in range(0, a):
-            if a > 1:
-                copia = np.insert(copia, 0, columnas_secundarias[i], axis=1)
-                copia = np.insert(copia, len(copia[0]), columnas_secundarias2[i], axis=1)
-            else:
-                copia = np.insert(copia, 0, columnas_secundarias, axis=1)
-                copia = np.insert(copia, len(copia[0]), columnas_secundarias2, axis=1)
-        for i in range(0, a): #se agregan filas
-            if a > 1:
-                copia = np.insert(copia, 0, filas_secundarias[i], axis=0)
-                copia = np.insert(copia, len(copia), filas_secundarias2[i], axis=0)
-            else:
-                copia = np.insert(copia, 0, filas_secundarias, axis=0)
-                copia = np.insert(copia, len(copia), filas_secundarias2, axis=0)
-        CCorrelation_ceros = np.zeros((len(image) , len(image[0]))) # matriz para cross-correlación parcial sin bordes
-        for filas in range(0+a, len(copia) - a):  # recorrido para realizar cross-correlación de forma similar a método fill
-            for columnas in range(0+b, len(copia[0]) - b):
-                i_fila = filas - a
-                for multi_i in range(len(kernel)):
-                    j_column = columnas - b
-                    for multi_j in range(len(kernel[0])):
-                        CCorrelation_ceros[filas-a][columnas-b] += copia[i_fila][j_column] * kernel[multi_i][multi_j] # cálculo suma para crosscorrelación
-                        j_column += 1
-                    i_fila += 1
-        CCorrelation=CCorrelation_ceros.copy() # respuesta final en la cual tendrá bordes reflejjados de
-        for reflejo in range(a): # recorrido para reflego de columnas
-            CCorrelation=np.insert(CCorrelation,0,CCorrelation_ceros[:, reflejo],axis=1)
-            CCorrelation = np.insert(CCorrelation, len(CCorrelation[0]), CCorrelation_ceros[:, len(CCorrelation_ceros[0])-1-reflejo], axis=1)
-        for reflejofilas in range(a): # recorrido para reflejo filas
-            fila_aux= np.append(CCorrelation_ceros[reflejofilas, :],np.array(CCorrelation_ceros[0][len(CCorrelation_ceros[0])-1])*a) # a cada fila se le agregan en sus extremos los valores de las esquinas correspondientes
-            fila_aux=np.insert(fila_aux, 0, np.array(CCorrelation_ceros[0][0])*a)
-            fila_aux_final=np.append(CCorrelation_ceros[len(CCorrelation_ceros)-1-reflejofilas, :],np.array(CCorrelation_ceros[0][len(CCorrelation_ceros)-1])*a)
-            fila_aux_final=np.insert(fila_aux_final, 0, np.array(CCorrelation_ceros[len(CCorrelation_ceros)-1][0])*a)
-            CCorrelation = np.insert(CCorrelation, 0,fila_aux, axis=0)
-            CCorrelation = np.insert(CCorrelation, len(CCorrelation_ceros), fila_aux_final,axis=0)"""
+        CCorrelation= np.pad(CCorrelation, a, mode="symmetric") # se añaden bordes finales reflejados de la crosscorrelación con ayuda de la función de numpy utilizada para el marco inicial
     elif boundary_condition=="valid": # método de frontera valid
         CCorrelation=np.zeros((len(image)-a*2,len(image[0])-b*2)) # matriz para almacenar respuesta
         for filas in range(0+a,len(image)-a): # recorrido para cálculo crosscorrelación como en métodos anterioes
@@ -179,6 +96,25 @@ print("error kernel a symm")
 print(error_ka_s)
 print("\n",prueba_scipy_s)
 print("\n",prueba_ka_s)
+print(prueba_ka_s.shape)
+print(prueba_scipy_s.shape)
+filtro_Gauss_punto3=gaussian_kernel(5,1) # se crea filtro de Gauss con función proporcionada en el enunciado. Filtro de 5x5b con sigma de 1
+cross_filtroGauss=MyCCorrelation_201719942_201822262(rosas,filtro_Gauss_punto3) # cross-correlación con condición de frontera fill de imagen con ruido y filtro de Gauss creado previamente
+plt.figure("Original_kernel_b_Gauss") # figura para mostrar imagen original e imagen filtrada con filtro de gauss decrito previamente  y kernel b
+plt.subplot(1,3,1) # cada imagen tiene su respectivo subplot, remoción de ejes, título y es visualizado con mapa de color de rises
+plt.title("Imagen original escala grises")
+plt.imshow(prueba_ka_s,cmap="gray")
+plt.axis("off")
+plt.subplot(1,3,2)
+plt.title("Imagen con kernel b")
+plt.imshow(prueba_scipy_s,cmap="gray")
+plt.axis("off")
+plt.subplot(1,3,3)
+plt.title("Imagen con filtro Gauss:\n5x5 y σ = 1")
+plt.imshow(rosas,cmap="gray")
+plt.axis("off")
+plt.tight_layout()
+plt.show()
 ##PROBLEMA BIOMÉDICA
 #input("Press Enter to continue...") # input para continuar con el programa cuando usuario presione Enter cuando desee
 reference1=io.imread("reference1.jpg") # carga de las diferentes imágenes a trabajar en el problema biomédico
