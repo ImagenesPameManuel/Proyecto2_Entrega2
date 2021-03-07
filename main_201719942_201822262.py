@@ -256,30 +256,31 @@ plt.show()
 # Filtro medio adaptativo
 def MyAdaptMedian_201719942_201822262(gray_image, window_size, max_window_size):
     imagen_marco=np.pad(gray_image.copy(),int(max_window_size)//2,mode="symmetric")# copia de la imagen con bordes de modo symm del tamaño máximo que podría llegar a tener la ventana, se utiliza la función de numpy pad
-    filas,columnas=len(gray_image),len(gray_image[0])
-    filtered_image=np.zeros((filas, columnas))
-    desfase=int(max_window_size)//2
+    filas,columnas=len(gray_image),len(gray_image[0]) #se definen filas y columnas con las dimensiones de la imagen
+    filtered_image=np.zeros((filas, columnas)) #se crea un arreglo de ceros para almacenar la nueva imagen
+    desfase=int(max_window_size)//2 # variable para determinar en donde está el primer pixel de la imagen
     for fila in range(filas):
         for columna in range(columnas):
-            fila_pix_original,column_pix_original=fila+desfase,columna+desfase
-            size_actual = window_size
-            while size_actual <= max_window_size:
-                marco_actual = int(size_actual) // 2
+            fila_pix_original,column_pix_original=fila+desfase,columna+desfase #variables para determinar fila y columna
+            size_actual = window_size #variable con el tamaño de la imagen
+            while size_actual <= max_window_size: #iteración hasta que la imagen exceda el tamaño maximo de ventana
+                marco_actual = int(size_actual) // 2 # definición del tamaño del marco utilizando el tamaño actual
                 mini_matriz = imagen_marco[fila_pix_original - marco_actual:   (fila_pix_original) + marco_actual + 1,column_pix_original - marco_actual:    column_pix_original + marco_actual + 1]
+                # se extrae una matriz pequeña utilizando la imagen con marco como referencia
                 z_min = np.min(mini_matriz.flatten())  # variable para el mínino, se usa la funcion de numpy min
                 z_max = np.max(mini_matriz.flatten())  # variable para el máximo, se usa la funcion de numpy max
                 z_med = np.median(mini_matriz.flatten())  # variable para la mediana, se usa la función de numpy median
-                A1 = z_med - z_min
-                A2 = z_med - z_max
+                A1 = z_med - z_min # variable para saber quien es mayor, la media o el minimo
+                A2 = z_med - z_max # variable para saber quien es mayor, la media o el máximo
                 if A1>0 and A2<0:
-                    centro=imagen_marco[fila_pix_original,column_pix_original]
-                    B1=centro-z_min
-                    B2=centro-z_max
+                    centro=imagen_marco[fila_pix_original,column_pix_original] # se ubica el centro de la imagen con marvo
+                    B1=centro-z_min # comparacion del centro con el minimo
+                    B2=centro-z_max # comparacion del centro con el máximo
                     if B1>0 and B2<0:
-                        filtered_image[fila][columna] = centro
+                        filtered_image[fila][columna] = centro # se llenan los valores para la imagen filtrada dependiendo de si es un impulso o no
                         #print("centro")
                     else:
-                        filtered_image[fila][columna] = z_med
+                        filtered_image[fila][columna] = z_med # se llenan los valores para la imagen filtrada dependiendo de si es un impulso o no
                         #print("opc2")
                     break
                 else:
@@ -287,7 +288,7 @@ def MyAdaptMedian_201719942_201822262(gray_image, window_size, max_window_size):
                         filtered_image[fila][columna]=z_med
                         #print("opcmax")
                     size_actual+=1
-    return filtered_image
+    return filtered_image #se retorna la imagen
 #median(imag_ruido1)
 ## Pruebe con 3 tamaños de ventana diferentes aplicar su función de filtro mediano adaptativo a las imágenes con ruido. Muestre sus experimentos en un subplot con títulos las imágenes con ruido y las respuestas después del filtrado.
 plt.figure()
