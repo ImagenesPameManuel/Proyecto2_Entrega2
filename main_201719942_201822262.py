@@ -12,66 +12,84 @@ from skimage.morphology import disk
 import matplotlib.pyplot as plt
 import os
 import cv2
-#con la función indicada en la guía se crea filtro gaussiano
+##con la función indicada en la guía se crea filtro gaussiano
 def gaussian_kernel(size, sigma):
     size = int(size)//2
     x, y = np.mgrid[-size:size+1, -size:size+1]
     normal = 1/(2.0 * np.pi * sigma**2)
     g = np.exp(-((x**2 + y**2)/(2.0 * sigma**2))) * normal
     return g
-def MyCCorrelation_201719942_201822262(image, kernel, boundary_condition="fill"):
+def MyNormCCorrelation_201719942_201822262(image, kernel, boundary_condition="fill"):
     """
-    Función para la cross-correlación de una imagen y un kenerl dados. Se aplica la condición de frontera  deseada por el usuario
+    Función para la cross-correlación normalizada de una imagen y un kenerl dados. Se aplica la condición de frontera  deseada por el usuario
     :param image: arreglo de la imagen
-    :param kernel: arreglo del filtro con el cual se realizará la cross-correlación
-    :param boundary_condition: str "fill", "valid" o "symm" que determinará la condición de frontera que se le aplicará en la cross-correlación
-    :return: arreglo de la imagen una vez realizada la cross-correlación
+    :param kernel: arreglo del filtro con el cual se realizará la cross-correlación normalizada
+    :param boundary_condition: str "fill", "valid" o "symm" que determinará la condición de frontera que se le aplicará en la cross-correlación normalizada
+    :return: arreglo de la imagen una vez realizada la cross-correlación normalizada
     """
-    CCorrelation=0 # se inicializa variable respuesta de crosscorrelación que se modificará según el método de frontera
+    normalized_ccorrelation=0 # se inicializa variable respuesta de crosscorrelación que se modificará según el método de frontera
     a=round((len(kernel)-1)/2) # cálculo de a y b
     b=round((len(kernel[0])-1)/2)
+    I0 = np.mean(kernel)
+    I0_desvest = np.std(kernel)
     if boundary_condition=="fill": # se realizan serie de condicionales los cuales se aplicarán según la condición de frontera que igresa por parámetro
-        fill_image=image.copy() #copia de la imagen para generar bordes en la imagen
-        for i in range(a): # recorrido para generar bordes de 0s en la imagen
-            fill_image=np.insert(fill_image, 0, 0, axis=1) #se inserta marco de 0s en la imagen fiil_image con uso de np.insert indicando como parámetros el arreglo al cual se le insertarán los elementos indicados como 3er parámetro en la posición indicada en el 2do parámetro del eje indicado como 4to parámetro columnas (1) o filas (0)
-            fill_image=np.insert(fill_image, 0, 0, axis=0)
-            fill_image=np.insert(fill_image, fill_image.shape[0], 0, axis=0)
-            fill_image=np.insert(fill_image, fill_image.shape[1], 0, axis=1)
-        CCorrelation = np.zeros((len(image)+a*2, len(image[0])+b*2)) # se crea matriz para almacenar cross-correlación con tamaño dependiente de a y b          #print(CCorrelation.shape)
+        fill_image = np.pad(image.copy(), a, mode="constant") #copia de la imagen para generar bordes en la imagen
+        normalized_ccorrelation = np.zeros((len(image)+a*2, len(image[0])+b*2)) # se crea matriz para almacenar cross-correlación con tamaño dependiente de a y b          #print(CCorrelation.shape)
         for filas in range(0+a,len(fill_image)-a): # recorrido para realizar la cross-correlación empezando sobre pixel central dado por a y b
             for columnas in range(0+b,len(fill_image[0])-b):
+                mini_matriz = fill_image[filas-a:filas+a+1, columnas-b:columnas+b+1]
+                I1 = np.mean(mini_matriz)
+                I1_desvest = np.std(mini_matriz)
                 i_fila=filas-a # contador de filas para tomar vecinos de pixel central
+                factor_1_num = 0
+                factor_2_num = 0
                 for multi_i in range(len(kernel)): # recorrido por el tamaño del que kernal para sacar prom del pixelcentral evaluda
                     j_column=columnas-b # contador pata columans para tomar vecinos del pixel central
                     for multi_j in range(len(kernel[0])):
-                        CCorrelation[filas][columnas]+=fill_image[i_fila][j_column]*kernel[multi_i][multi_j] # cálculo cross-correlación
+                        factor_1_num += kernel[multi_i][multi_j] - I0
+                        factor_2_num += fill_image[i_fila][j_column] - I1
                         j_column+=1 #aumento contador columnas
                     i_fila+=1 # aumento contador filas
+                normalized_ccorrelation[filas][columnas] = (factor_1_num*factor_2_num)/(I1_desvest*I0_desvest) # cálculo cross-correlación normalizada
     elif boundary_condition=="symm": # para condición de frontera symm # se realiza arreglo de la entrega pasada de esta condición de frontera
         imagen_marco = np.pad(image.copy(), a, mode="symmetric") # reflejo de bordes con ayuda de librería numpy pad y modo symmetric del tamaño que indique el kernel de entrada
-        CCorrelation = np.zeros((len(image) , len(image[0]) ))  # se crea matriz para almacenar cross-correlación con tamaño dependiente de a y b          #print(CCorrelation.shape)
+        normalized_ccorrelation = np.zeros((len(image) , len(image[0]) ))  # se crea matriz para almacenar cross-correlación con tamaño dependiente de a y b          #print(CCorrelation.shape)
         for filas in range(0 + a, len(imagen_marco) - a):  # recorrido para realizar la cross-correlación empezando sobre pixel central dado por a y b
             for columnas in range(0 + b, len(imagen_marco[0]) - b):
+                mini_matriz = imagen_marco[filas - a:filas + a + 1, columnas - b:columnas + b + 1]
+                I1 = np.mean(mini_matriz)
+                I1_desvest = np.std(mini_matriz)
+                factor_1_num = 0
+                factor_2_num = 0
                 i_fila = filas - a  # contador de filas para tomar vecinos de pixel central
                 for multi_i in range(len(kernel)):  # recorrido por el tamaño del que kernal para sacar prom del pixelcentral evaluda
                     j_column = columnas - b  # contador pata columans para tomar vecinos del pixel central
                     for multi_j in range(len(kernel[0])):
-                        CCorrelation[filas-a][columnas-b] += imagen_marco[i_fila][j_column] * kernel[multi_i][multi_j]  # cálculo cross-correlación
+                        factor_1_num += kernel[multi_i][multi_j] - I0
+                        factor_2_num += imagen_marco[i_fila][j_column] - I1
                         j_column += 1  # aumento contador columnas
                     i_fila += 1  # aumento contador filas
-        CCorrelation= np.pad(CCorrelation, a, mode="symmetric") # se añaden bordes finales reflejados de la crosscorrelación con ayuda de la función de numpy utilizada para el marco inicial
+                normalized_ccorrelation[filas][columnas] = (factor_1_num * factor_2_num) / ( I1_desvest * I0_desvest)  # cálculo cross-correlación normalizada
+        normalized_ccorrelation= np.pad(normalized_ccorrelation, a, mode="symmetric") # se añaden bordes finales reflejados de la crosscorrelación con ayuda de la función de numpy utilizada para el marco inicial
     elif boundary_condition=="valid": # método de frontera valid
-        CCorrelation=np.zeros((len(image)-a*2,len(image[0])-b*2)) # matriz para almacenar respuesta
+        normalized_ccorrelation=np.zeros((len(image)-a*2,len(image[0])-b*2)) # matriz para almacenar respuesta
         for filas in range(0+a,len(image)-a): # recorrido para cálculo crosscorrelación como en métodos anterioes
             for columnas in range(0+b,len(image[0])-b):
+                mini_matriz = image[filas - a:filas + a + 1, columnas - b:columnas + b + 1]
+                I1 = np.mean(mini_matriz)
+                I1_desvest = np.std(mini_matriz)
+                factor_1_num = 0
+                factor_2_num = 0
                 i_fila=filas-a
                 for multi_i in range(len(kernel)):
                     j_column=columnas-b
                     for multi_j in range(len(kernel[0])):
-                        CCorrelation[filas-a][columnas-b]+=image[i_fila][j_column]*kernel[multi_i][multi_j] # cálculo cross-correlación
+                        factor_1_num += kernel[multi_i][multi_j] - I0
+                        factor_2_num += image[i_fila][j_column] - I1
                         j_column+=1
                     i_fila+=1
-    return CCorrelation
+                normalized_ccorrelation[filas - a][columnas - b] = (factor_1_num * factor_2_num) / ( I1_desvest * I0_desvest)  # cálculo cross-correlación normalizada
+    return normalized_ccorrelation
 def error_cuadrado(imageref,imagenew):
     """
     Calculo error cruadrático medio
@@ -89,8 +107,8 @@ kernel_a=np.array([[1,1,1],[1,1,1],[1,1,1]])
 rosas=io.imread("roses.jpg")
 #rosas_noise=io.imread("noisy_roses.jpg")
 rosas=rgb2gray(rosas) #se le quita 3D a la imagen para convertirla en una imagen blanco-negro
-prueba_ka_s=MyCCorrelation_201719942_201822262(rosas,kernel_a,boundary_condition="symm")
-prueba_scipy_s=correlate2d(rosas,kernel_a,boundary="symm")
+prueba_ka_s=MyNormCCorrelation_201719942_201822262(rosas,kernel_a,boundary_condition="fill")
+prueba_scipy_s=correlate2d(rosas,kernel_a,boundary="fill")
 error_ka_s=error_cuadrado(prueba_scipy_s, prueba_ka_s)
 print("error kernel a symm")
 print(error_ka_s)
@@ -99,7 +117,7 @@ print("\n",prueba_ka_s)
 print(prueba_ka_s.shape)
 print(prueba_scipy_s.shape)
 filtro_Gauss_punto3=gaussian_kernel(5,1) # se crea filtro de Gauss con función proporcionada en el enunciado. Filtro de 5x5b con sigma de 1
-cross_filtroGauss=MyCCorrelation_201719942_201822262(rosas,filtro_Gauss_punto3) # cross-correlación con condición de frontera fill de imagen con ruido y filtro de Gauss creado previamente
+cross_filtroGauss=MyNormCCorrelation_201719942_201822262(rosas,filtro_Gauss_punto3) # cross-correlación con condición de frontera fill de imagen con ruido y filtro de Gauss creado previamente
 plt.figure("Original_kernel_b_Gauss") # figura para mostrar imagen original e imagen filtrada con filtro de gauss decrito previamente  y kernel b
 plt.subplot(1,3,1) # cada imagen tiene su respectivo subplot, remoción de ejes, título y es visualizado con mapa de color de rises
 plt.title("Imagen original escala grises")
@@ -362,3 +380,4 @@ print(c[   ( 2 ) -   1     :   ( 2 )  +  1  +1,2  -   1     :    2   + 1 + 1])
 
 print(kernel_c)
 print(c)
+##
